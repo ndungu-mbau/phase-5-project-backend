@@ -96,12 +96,8 @@
           "name": "donations_user_id_users_user_id_fk",
           "tableFrom": "donations",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["user_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -109,12 +105,8 @@
           "name": "donations_home_id_childrens_homes_home_id_fk",
           "tableFrom": "donations",
           "tableTo": "childrens_homes",
-          "columnsFrom": [
-            "home_id"
-          ],
-          "columnsTo": [
-            "home_id"
-          ],
+          "columnsFrom": ["home_id"],
+          "columnsTo": ["home_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -167,12 +159,8 @@
           "name": "reviews_user_id_users_user_id_fk",
           "tableFrom": "reviews",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["user_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -180,12 +168,8 @@
           "name": "reviews_home_id_childrens_homes_home_id_fk",
           "tableFrom": "reviews",
           "tableTo": "childrens_homes",
-          "columnsFrom": [
-            "home_id"
-          ],
-          "columnsTo": [
-            "home_id"
-          ],
+          "columnsFrom": ["home_id"],
+          "columnsTo": ["home_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -240,9 +224,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -285,12 +267,8 @@
           "name": "visits_user_id_users_user_id_fk",
           "tableFrom": "visits",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["user_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -298,12 +276,8 @@
           "name": "visits_home_id_childrens_homes_home_id_fk",
           "tableFrom": "visits",
           "tableTo": "childrens_homes",
-          "columnsFrom": [
-            "home_id"
-          ],
-          "columnsTo": [
-            "home_id"
-          ],
+          "columnsFrom": ["home_id"],
+          "columnsTo": ["home_id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
