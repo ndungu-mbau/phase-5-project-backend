@@ -8,6 +8,8 @@ import {
   integer,
 } from 'drizzle-orm/pg-core'
 
+export * from './auth'
+
 export const users = pgTable('users', {
   user_id: uuid('user_id').primaryKey().defaultRandom(),
   password: varchar('password', { length: 255 }).notNull(),
