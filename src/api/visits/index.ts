@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Hono } from 'hono'
 import { db, visits } from '../../db'
 import { eq } from 'drizzle-orm'
+import { authenticate } from '../../auth/middleware'
 
 const visitsRouter = new Hono()
 
@@ -15,7 +16,7 @@ const visitSchema = z.object({
 })
 
 // Create a new visit
-visitsRouter.post('/', async c => {
+visitsRouter.post('/', authenticate, async c => {
   const body = await c.req.json()
   const parsed = visitSchema.safeParse(body)
   if (!parsed.success) {
@@ -26,7 +27,7 @@ visitsRouter.post('/', async c => {
 })
 
 // Read all visits with pagination
-visitsRouter.get('/', async c => {
+visitsRouter.get('/', authenticate, async c => {
   const page = parseInt(c.req.query('page') || '1', 10)
   const limit = parseInt(c.req.query('limit') || '10', 10)
   const offset = (page - 1) * limit
@@ -44,7 +45,7 @@ visitsRouter.get('/', async c => {
 })
 
 // Read a single visit by ID
-visitsRouter.get('/:id', async c => {
+visitsRouter.get('/:id', authenticate, async c => {
   const { id } = c.req.param()
   const [visit] = await db
     .select()
@@ -59,7 +60,7 @@ visitsRouter.get('/:id', async c => {
 })
 
 // Update a visit by ID
-visitsRouter.put('/:id', async c => {
+visitsRouter.put('/:id', authenticate, async c => {
   const { id } = c.req.param()
   const body = await c.req.json()
   const parsed = visitSchema.safeParse(body)
@@ -74,7 +75,7 @@ visitsRouter.put('/:id', async c => {
 })
 
 // Delete a visit by ID
-visitsRouter.delete('/:id', async c => {
+visitsRouter.delete('/:id', authenticate, async c => {
   const { id } = c.req.param()
   await db.delete(visits).where(eq(visits.visit_id, id))
   return c.json({ message: 'Visit deleted' })

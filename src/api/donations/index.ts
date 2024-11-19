@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Hono } from 'hono'
 import { db, donations } from '../../db'
 import { eq } from 'drizzle-orm'
+import { authenticate } from '../../auth/middleware'
 
 const donationsRouter = new Hono()
 
@@ -16,7 +17,7 @@ const donationSchema = z.object({
 })
 
 // Create a new donation
-donationsRouter.post('/', async c => {
+donationsRouter.post('/', authenticate, async c => {
   const body = await c.req.json()
   const parsed = donationSchema.safeParse(body)
   if (!parsed.success) {
@@ -27,7 +28,7 @@ donationsRouter.post('/', async c => {
 })
 
 // Read all donations with pagination
-donationsRouter.get('/', async c => {
+donationsRouter.get('/', authenticate, async c => {
   const page = parseInt(c.req.query('page') || '1', 10)
   const limit = parseInt(c.req.query('limit') || '10', 10)
   const offset = (page - 1) * limit
@@ -49,7 +50,7 @@ donationsRouter.get('/', async c => {
 })
 
 // Read a single donation by ID
-donationsRouter.get('/:id', async c => {
+donationsRouter.get('/:id', authenticate, async c => {
   const { id } = c.req.param()
   const [donation] = await db
     .select()
@@ -64,7 +65,7 @@ donationsRouter.get('/:id', async c => {
 })
 
 // Update a donation by ID
-donationsRouter.put('/:id', async c => {
+donationsRouter.put('/:id', authenticate, async c => {
   const { id } = c.req.param()
   const body = await c.req.json()
   const parsed = donationSchema.safeParse(body)
@@ -79,7 +80,7 @@ donationsRouter.put('/:id', async c => {
 })
 
 // Delete a donation by ID
-donationsRouter.delete('/:id', async c => {
+donationsRouter.delete('/:id', authenticate, async c => {
   const { id } = c.req.param()
   await db.delete(donations).where(eq(donations.donation_id, id))
   return c.json({ message: 'Donation deleted' })

@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Hono } from 'hono'
 import { db, childrensHomes } from '../../db'
 import { eq } from 'drizzle-orm'
+import { authenticate } from '../../auth/middleware'
 
 const homes = new Hono()
 
@@ -15,7 +16,7 @@ const childrensHomeSchema = z.object({
 })
 
 // Create a new children's home
-homes.post('/', async c => {
+homes.post('/', authenticate, async c => {
   const body = await c.req.json()
   const parsed = childrensHomeSchema.safeParse(body)
   if (!parsed.success) {
@@ -63,7 +64,7 @@ homes.get('/:id', async c => {
 })
 
 // Update a children's home by ID
-homes.put('/:id', async c => {
+homes.put('/:id', authenticate, async c => {
   const { id } = c.req.param()
   const body = await c.req.json()
   const parsed = childrensHomeSchema.safeParse(body)

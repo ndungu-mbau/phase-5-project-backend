@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Hono } from 'hono'
 import { db, reviews } from '../../db'
 import { eq } from 'drizzle-orm'
+import { authenticate } from '../../auth/middleware'
 
 const reviewsRouter = new Hono()
 
@@ -14,7 +15,7 @@ const reviewSchema = z.object({
 })
 
 // Create a new review
-reviewsRouter.post('/', async c => {
+reviewsRouter.post('/', authenticate, async c => {
   const body = await c.req.json()
   const parsed = reviewSchema.safeParse(body)
   if (!parsed.success) {
@@ -25,7 +26,7 @@ reviewsRouter.post('/', async c => {
 })
 
 // Read all reviews with pagination
-reviewsRouter.get('/', async c => {
+reviewsRouter.get('/', authenticate, async c => {
   const page = parseInt(c.req.query('page') || '1', 10)
   const limit = parseInt(c.req.query('limit') || '10', 10)
   const offset = (page - 1) * limit
@@ -47,7 +48,7 @@ reviewsRouter.get('/', async c => {
 })
 
 // Read a single review by ID
-reviewsRouter.get('/:id', async c => {
+reviewsRouter.get('/:id', authenticate, async c => {
   const { id } = c.req.param()
   const [review] = await db
     .select()
@@ -62,7 +63,7 @@ reviewsRouter.get('/:id', async c => {
 })
 
 // Update a review by ID
-reviewsRouter.put('/:id', async c => {
+reviewsRouter.put('/:id', authenticate, async c => {
   const { id } = c.req.param()
   const body = await c.req.json()
   const parsed = reviewSchema.safeParse(body)
