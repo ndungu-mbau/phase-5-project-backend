@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { Hono } from 'hono'
 import { db, reviews } from '../../db'
 import { eq } from 'drizzle-orm'
-import { authenticate } from '../../auth/middleware'
+import { authenticate, authorize } from '../../auth/middleware'
 
 const reviewsRouter = new Hono()
 
@@ -15,70 +15,90 @@ const reviewSchema = z.object({
 })
 
 // Create a new review
-reviewsRouter.post('/', authenticate, async c => {
-  const body = await c.req.json()
-  const parsed = reviewSchema.safeParse(body)
-  if (!parsed.success) {
-    return c.json({ error: parsed.error.errors }, 400)
+reviewsRouter.post(
+  '/',
+  authenticate,
+  authorize('reviews', 'createAny'),
+  async c => {
+    const body = await c.req.json()
+    const parsed = reviewSchema.safeParse(body)
+    if (!parsed.success) {
+      return c.json({ error: parsed.error.errors }, 400)
+    }
+    const newReview = await db.insert(reviews).values(parsed.data)
+    return c.json(newReview, 201)
   }
-  const newReview = await db.insert(reviews).values(parsed.data)
-  return c.json(newReview, 201)
-})
+)
 
 // Read all reviews with pagination
-reviewsRouter.get('/', authenticate, async c => {
-  const page = parseInt(c.req.query('page') || '1', 10)
-  const limit = parseInt(c.req.query('limit') || '10', 10)
-  const offset = (page - 1) * limit
+reviewsRouter.get(
+  '/',
+  authenticate,
+  authorize('reviews', 'readAny'),
+  async c => {
+    const page = parseInt(c.req.query('page') || '1', 10)
+    const limit = parseInt(c.req.query('limit') || '10', 10)
+    const offset = (page - 1) * limit
 
-  const reviewsList = await db
-    .select()
-    .from(reviews)
-    .limit(limit)
-    .offset(offset)
+    const reviewsList = await db
+      .select()
+      .from(reviews)
+      .limit(limit)
+      .offset(offset)
 
-  const totalReviews = await db.select().from(reviews)
+    const totalReviews = await db.select().from(reviews)
 
-  return c.json({
-    total: totalReviews.length,
-    page,
-    limit,
-    reviews: reviewsList,
-  })
-})
+    return c.json({
+      total: totalReviews.length,
+      page,
+      limit,
+      reviews: reviewsList,
+    })
+  }
+)
 
 // Read a single review by ID
-reviewsRouter.get('/:id', authenticate, async c => {
-  const { id } = c.req.param()
-  const [review] = await db
-    .select()
-    .from(reviews)
-    .where(eq(reviews.review_id, id))
-    .limit(1)
+reviewsRouter.get(
+  '/:id',
+  authenticate,
+  authorize('reviews', 'readAny'),
+  async c => {
+    const { id } = c.req.param()
+    const [review] = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.review_id, id))
+      .limit(1)
 
-  if (!review) {
-    return c.json({ error: 'Review not found' }, 404)
+    if (!review) {
+      return c.json({ error: 'Review not found' }, 404)
+    }
+    return c.json(review)
   }
-  return c.json(review)
-})
+)
 
 // Update a review by ID
-reviewsRouter.put('/:id', authenticate, async c => {
-  const { id } = c.req.param()
-  const body = await c.req.json()
-  const parsed = reviewSchema.safeParse(body)
-  if (!parsed.success) {
-    return c.json({ error: parsed.error.errors }, 400)
+reviewsRouter.put(
+  '/:id',
+  authenticate,
+  authorize('reviews', 'updateAny'),
+  async c => {
+    const { id } = c.req.param()
+    const body = await c.req.json()
+    const parsed = reviewSchema.safeParse(body)
+    if (!parsed.success) {
+      return c.json({ error: parsed.error.errors }, 400)
+    }
+    const updatedReview = await db
+      .update(reviews)
+      .set(parsed.data)
+      .where(eq(reviews.review_id, id))
+    return c.json(updatedReview)
   }
-  const updatedReview = await db
-    .update(reviews)
-    .set(parsed.data)
-    .where(eq(reviews.review_id, id))
-  return c.json(updatedReview)
-})
+)
 
 // Delete a review by ID
-reviewsRouter.delete('/:id', async c => {
+reviewsRouter.delete('/:id', authorize('reviews', 'deleteAny'), async c => {
   const { id } = c.req.param()
   await db.delete(reviews).where(eq(reviews.review_id, id))
   return c.json({ message: 'Review deleted' })

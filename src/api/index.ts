@@ -6,6 +6,7 @@ import { donationsRouter } from './donations'
 import { visitsRouter } from './visits'
 import { reviewsRouter } from './reviews'
 import { login, signUp } from '../auth'
+import { authenticate, authorize } from '../auth/middleware'
 
 const app = new Hono().basePath('/api')
 
