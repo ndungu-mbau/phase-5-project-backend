@@ -20,7 +20,7 @@ export const signUp = async (c: Context) => {
 
   const [user] = await db
     .insert(users)
-    .values({ email, password, address })
+    .values({ email, password, address, role: 'user' })
     .returning()
     .execute()
 
