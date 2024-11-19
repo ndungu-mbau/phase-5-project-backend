@@ -7,7 +7,7 @@
   "typings": "./dist/index.d.ts",
   "scripts": {
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizle-kit migrate",
+    "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "build": "rm -rf ./dist && node esbuild.js",
     "start": "node ./dist/index.js",
