@@ -15,7 +15,7 @@ export const users = pgTable('users', {
   password: varchar('password', { length: 255 }).notNull(),
   email: varchar('email', { length: 100 }).notNull().unique(),
   address: text('address'),
-  role: varchar('role', { length: 10 }).default('user'),
+  role: varchar('role', { length: 10 }).default('user').notNull(),
 })
 
 export const childrensHomes = pgTable('childrens_homes', {
