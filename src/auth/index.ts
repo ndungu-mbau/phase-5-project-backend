@@ -46,3 +46,26 @@ export const login = async (c: Context) => {
   setCookie(c, 'sessionId', sessionId, { httpOnly: true })
   return c.json({ message: 'Login successful' }, 200)
 }
+
+export const createAdmin = async (c: Context) => {
+  const { email, password, address } = await c.req.json()
+  const existingUser = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute()
+
+  if (existingUser.length > 0) {
+    return c.json({ error: 'User already exists' }, 400)
+  }
+
+  const [user] = await db
+    .insert(users)
+    .values({ email, password, address, role: 'admin' })
+    .returning()
+    .execute()
+
+  if (user) {
+    return c.json({ message: 'Admin created successfully' }, 201)
+  }
+}

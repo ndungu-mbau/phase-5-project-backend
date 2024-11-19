@@ -5,6 +5,7 @@ const ac = new AccessControl()
 
 // Admin can do anything
 ac.grant('admin')
+  .createAny('admin')
   .createAny('homes')
   .readAny('homes')
   .updateAny('homes')
@@ -22,10 +23,11 @@ ac.grant('admin')
   .updateAny('reviews')
   .deleteAny('reviews')
 
+// User Roles
 ac.grant('user')
   .readAny('homes')
   .createAny('donations')
-  .readAny('donations')
+  .readOwn('donations')
   .createAny('visits')
   .readAny('visits')
   .createAny('reviews')
